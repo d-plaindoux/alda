@@ -8,12 +8,7 @@ Intuitive and simple to use OCaml parsec
 module Parsec = Parsers.Parsec (Sources.FromChars)
 
 let rec expr () =
-  let open Parsers.Monad (Parsec) in
-  let open Parsers.Eval (Parsec) in
-  let open Parsers.Operator (Parsec) in
-  let open Parsers.Occurrence (Parsec) in
-  let open Parsers.Literal (Parsec) in
-  let open Parsers.Atomic (Parsec) in
+  let open Parsers.All_for_chars (Parsec) in
   let expr = do_lazy (lazy (expr ())) in
   (* 
     expr ::= natural ((+|-) expr)? | "(" expr ")" 
@@ -23,9 +18,6 @@ let rec expr () =
   (char '(' >~> expr <~< char ')')
   <&> fun _ -> ()
 ```
-
-Well, this example shows a simple usage but the number of modules 
-to be opened is not singular! This is going to be simplified ... 
 
 # License 
 

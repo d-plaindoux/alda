@@ -336,3 +336,17 @@ module Expr (P : Specs.PARSEC) = struct
     let* y = p >>= fun r -> infixR op p r <|> return r in
     return @@ f x y
 end
+
+module All (P : Specs.PARSEC) = struct
+  include Monad (P)
+  include Eval (P)
+  include Operator (P)
+  include Occurrence (P)
+  include Atomic (P)
+  include Expr (P)
+end
+
+module All_for_chars (P : Specs.PARSEC with type Source.e = char) = struct
+  include All (P)
+  include Literal (P)
+end

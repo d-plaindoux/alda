@@ -71,3 +71,19 @@ module Expr : functor (P : Specs.PARSEC) -> sig
   val infixL : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
   val infixR : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
 end
+
+module All : functor (P : Specs.PARSEC) -> sig
+  include module type of Monad (P)
+  include module type of Eval (P)
+  include module type of Operator (P)
+  include module type of Occurrence (P)
+  include module type of Atomic (P)
+  include module type of Expr (P)
+end
+
+module All_for_chars : functor
+  (P : Specs.PARSEC with type Source.e = char)
+  -> sig
+  include module type of All (P)
+  include module type of Literal (P)
+end

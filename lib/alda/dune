@@ -1,0 +1,5 @@
+(library
+ (name alda)
+ (public_name alda)
+ (libraries alda.source alda.parser)
+ (modules_without_implementation alda))

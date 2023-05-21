@@ -1,0 +1,5 @@
+(library
+ (name alda_source)
+ (public_name alda.source)
+ (libraries preface)
+ (modules_without_implementation specs))

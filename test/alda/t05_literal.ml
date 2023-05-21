@@ -192,7 +192,7 @@ let parser_lookahead_char_then_char () =
 
 let cases =
   let open Alcotest in
-  ( "Chars Parser"
+  ( "Literal Parser"
   , [
       test_case "char" `Quick parser_char
     ; test_case "char fail" `Quick parser_char_fail

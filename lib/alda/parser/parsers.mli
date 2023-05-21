@@ -23,6 +23,7 @@ module Operator : functor (P : Specs.PARSEC) -> sig
   val ( <~< ) : 'a P.t -> 'b P.t -> 'a P.t
   val ( >~> ) : 'a P.t -> 'b P.t -> 'b P.t
   val ( <|> ) : 'a P.t -> 'a P.t -> 'a P.t
+  val ( <||> ) : 'a P.t -> 'a P.t -> 'a P.t
   val ( <~|~> ) : 'a P.t -> 'b P.t -> ('a, 'b) Either.t P.t
   val ( <?> ) : 'a P.t -> ('a -> bool) -> 'a P.t
 end
@@ -39,13 +40,6 @@ module Occurrence : functor (P : Specs.PARSEC) -> sig
   val opt : 'a P.t -> 'a option P.t
   val rep : 'a P.t -> 'a list P.t
   val opt_rep : 'a P.t -> 'a list P.t
-end
-
-module Expr : functor (P : Specs.PARSEC) -> sig
-  val term : ('a -> 'a) P.t -> 'a P.t -> ('a -> 'a) P.t -> 'a P.t
-  val infixN : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
-  val infixL : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
-  val infixR : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
 end
 
 module Literal : functor (P : Specs.PARSEC with type Source.e = char) -> sig
@@ -66,4 +60,14 @@ module Literal : functor (P : Specs.PARSEC with type Source.e = char) -> sig
     val string : string P.t
     val char : char P.t
   end
+end
+
+(** See
+    https://hackage.haskell.org/package/parser-combinators-1.3.0/docs/Control-Monad-Combinators-Expr.html *)
+
+module Expr : functor (P : Specs.PARSEC) -> sig
+  val term : ('a -> 'a) P.t -> 'a P.t -> ('a -> 'a) P.t -> 'a P.t
+  val infixN : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
+  val infixL : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
+  val infixR : ('a -> 'a -> 'a) P.t -> 'a P.t -> 'a -> 'a P.t
 end

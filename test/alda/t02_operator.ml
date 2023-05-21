@@ -52,6 +52,33 @@ let parser_choice_fail () =
   and expected = (None, true) in
   Alcotest.(check (pair (option char) bool)) "choice fail" expected result
 
+let parser_backtrack_choice_left () =
+  let open Parsers.Monad (Parsec) in
+  let open Parsers.Operator (Parsec) in
+  let result = response @@ (return 'a' <||> return 'b') @@ Parsec.source []
+  and expected = (Some 'a', false) in
+  Alcotest.(check (pair (option char) bool))
+    "backtrack choice left" expected result
+
+let parser_backtrack_choice_right () =
+  let open Parsers.Monad (Parsec) in
+  let open Parsers.Eval (Parsec) in
+  let open Parsers.Operator (Parsec) in
+  let result = response @@ (fail <||> return 'b') @@ Parsec.source []
+  and expected = (Some 'b', false) in
+  Alcotest.(check (pair (option char) bool))
+    "backtrack choice right" expected result
+
+let parser_backtrack_choice_do_not_fail () =
+  let open Parsers.Monad (Parsec) in
+  let open Parsers.Eval (Parsec) in
+  let open Parsers.Operator (Parsec) in
+  let result =
+    response @@ (fail ~consumed:true <||> return 'b') @@ Parsec.source []
+  and expected = (Some 'b', false) in
+  Alcotest.(check (pair (option char) bool))
+    "backtrack choice do not fail" expected result
+
 let parser_either_choice_left () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Eval (Parsec) in
@@ -91,6 +118,10 @@ let cases =
     ; test_case "choice left" `Quick parser_choice_left
     ; test_case "choice right" `Quick parser_choice_right
     ; test_case "choice fail" `Quick parser_choice_fail
+    ; test_case "backtrack choice left" `Quick parser_backtrack_choice_left
+    ; test_case "backtrack choice right" `Quick parser_backtrack_choice_right
+    ; test_case "backtrack choice do not fail" `Quick
+        parser_backtrack_choice_do_not_fail
     ; test_case "either choice left" `Quick parser_either_choice_left
     ; test_case "either choice right" `Quick parser_either_choice_right
     ; test_case "satisfy" `Quick parser_satisfy

@@ -124,6 +124,8 @@ module Operator (P : Specs.PARSEC) = struct
   let ( <|> ) p1 p2 =
     Functor.(p1 <~|~> p2 <&> function Either.Left a | Either.Right a -> a)
 
+  let ( <||> ) p1 p2 = Eval.do_try p1 <|> p2
+
   let ( <?> ) p f =
     let open Eval in
     satisfy p f
@@ -197,51 +199,6 @@ module Occurrence (P : Specs.PARSEC) = struct
 
   let rep p = sequence false p
   let opt_rep p = sequence true p
-end
-
-(* See https://hackage.haskell.org/package/parser-combinators-1.3.0/docs/src/Control.Monad.Combinators.Expr.html#Operator *)
-module Expr (P : Specs.PARSEC) = struct
-  module Monad = Monad (P)
-  module Operator = Operator (P)
-
-  let option x p =
-    let open Monad in
-    let open Operator in
-    p <|> return x
-
-  let term prefix t postfix =
-    let open Stdlib.Fun in
-    let open Monad in
-    let open Monad.Syntax in
-    let* pre = option id prefix in
-    let* x = t in
-    let* post = option id postfix in
-    return @@ post @@ pre x
-
-  let infixN op p x =
-    let open Monad in
-    let open Monad.Syntax in
-    let* f = op in
-    let* y = p in
-    return @@ f x y
-
-  let rec infixL op p x =
-    let open Monad in
-    let open Monad.Syntax in
-    let open Operator in
-    let* f = op in
-    let* y = p in
-    let r = f x y in
-    infixL op p r <|> return r
-
-  let rec infixR op p x =
-    let open Monad in
-    let open Monad.Syntax in
-    let open Monad.Infix in
-    let open Operator in
-    let* f = op in
-    let* y = p >>= fun r -> infixR op p r <|> return r in
-    return @@ f x y
 end
 
 module Literal (P : Specs.PARSEC with type Source.e = char) = struct
@@ -334,4 +291,48 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
     let string = string_delimited
     let char = char_delimited
   end
+end
+
+module Expr (P : Specs.PARSEC) = struct
+  module Monad = Monad (P)
+  module Operator = Operator (P)
+
+  let option x p =
+    let open Monad in
+    let open Operator in
+    p <|> return x
+
+  let term prefix t postfix =
+    let open Stdlib.Fun in
+    let open Monad in
+    let open Monad.Syntax in
+    let* pre = option id prefix in
+    let* x = t in
+    let* post = option id postfix in
+    return @@ post @@ pre x
+
+  let infixN op p x =
+    let open Monad in
+    let open Monad.Syntax in
+    let* f = op in
+    let* y = p in
+    return @@ f x y
+
+  let rec infixL op p x =
+    let open Monad in
+    let open Monad.Syntax in
+    let open Operator in
+    let* f = op in
+    let* y = p in
+    let r = f x y in
+    infixL op p r <|> return r
+
+  let rec infixR op p x =
+    let open Monad in
+    let open Monad.Syntax in
+    let open Monad.Infix in
+    let open Operator in
+    let* f = op in
+    let* y = p >>= fun r -> infixR op p r <|> return r in
+    return @@ f x y
 end

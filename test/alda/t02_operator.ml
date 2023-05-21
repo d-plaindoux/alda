@@ -1,6 +1,11 @@
 open Common
 open Alda.Parser
 
+let to_result = function
+  | Some (Either.Left a) -> Some (Result.Ok a)
+  | Some (Either.Right a) -> Some (Result.Error a)
+  | None -> None
+
 let parser_seq () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Operator (Parsec) in
@@ -47,6 +52,27 @@ let parser_choice_fail () =
   and expected = (None, true) in
   Alcotest.(check (pair (option char) bool)) "choice fail" expected result
 
+let parser_either_choice_left () =
+  let open Parsers.Monad (Parsec) in
+  let open Parsers.Eval (Parsec) in
+  let open Parsers.Operator (Parsec) in
+  let result, consume =
+    response @@ (return 'b' <~|~> return 1) @@ Parsec.source []
+  and expected = (Some (Result.Ok 'b'), false) in
+  Alcotest.(check (pair (option (result char int)) bool))
+    "either choice left" expected
+    (to_result result, consume)
+
+let parser_either_choice_right () =
+  let open Parsers.Monad (Parsec) in
+  let open Parsers.Eval (Parsec) in
+  let open Parsers.Operator (Parsec) in
+  let result, consume = response @@ (fail <~|~> return 1) @@ Parsec.source []
+  and expected = (Some (Result.Error 1), false) in
+  Alcotest.(check (pair (option (result char int)) bool))
+    "either choice left" expected
+    (to_result result, consume)
+
 let parser_satisfy () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Eval (Parsec) in
@@ -65,5 +91,7 @@ let cases =
     ; test_case "choice left" `Quick parser_choice_left
     ; test_case "choice right" `Quick parser_choice_right
     ; test_case "choice fail" `Quick parser_choice_fail
+    ; test_case "either choice left" `Quick parser_either_choice_left
+    ; test_case "either choice right" `Quick parser_either_choice_right
     ; test_case "satisfy" `Quick parser_satisfy
     ] )

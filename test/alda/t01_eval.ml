@@ -45,7 +45,7 @@ let parser_do_try () =
 
 let parser_lookahead () =
   let open Parsers.Eval (Parsec) in
-  let result = response @@ do_try (fail ~consumed:true) @@ Parsec.source []
+  let result = response @@ lookahead (fail ~consumed:true) @@ Parsec.source []
   and expected = (None, false) in
   Alcotest.(check (pair (option char) bool)) "lookahead" expected result
 

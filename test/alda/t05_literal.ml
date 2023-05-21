@@ -172,6 +172,24 @@ let parser_delimited_char_meta () =
   Alcotest.(check (pair (option char) bool))
     "delimited char meta" expected result
 
+let parser_lookahead_char () =
+  let open Parsers.Eval (Parsec) in
+  let open Parsers.Operator (Parsec) in
+  let open Parsers.Literal (Parsec) in
+  let result = response @@ lookahead (char 'a') @@ Parsec.source [ 'a' ]
+  and expected = (Some 'a', false) in
+  Alcotest.(check (pair (option char) bool)) "lookahead char" expected result
+
+let parser_lookahead_char_then_char () =
+  let open Parsers.Eval (Parsec) in
+  let open Parsers.Operator (Parsec) in
+  let open Parsers.Literal (Parsec) in
+  let result =
+    response @@ (lookahead (char 'a') <~> char 'a') @@ Parsec.source [ 'a' ]
+  and expected = (Some ('a', 'a'), true) in
+  Alcotest.(check (pair (option (pair char char)) bool))
+    "lookahead char then char" expected result
+
 let cases =
   let open Alcotest in
   ( "Chars Parser"
@@ -200,4 +218,7 @@ let cases =
     ; test_case "delimited char" `Quick parser_delimited_char
     ; test_case "delimited char escaped" `Quick parser_delimited_char_escaped
     ; test_case "delimited char meta" `Quick parser_delimited_char_escaped
+    ; test_case "lookahead char" `Quick parser_lookahead_char
+    ; test_case "lookahead char then char" `Quick
+        parser_lookahead_char_then_char
     ] )

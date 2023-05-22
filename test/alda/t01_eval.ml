@@ -61,14 +61,6 @@ let parser_satisfy_false () =
   and expected = (None, false) in
   Alcotest.(check (pair (option int) bool)) "satisfy false" expected result
 
-let rec expr () =
-  let open Parsers.All_for_chars (Parsec) in
-  let expr = do_lazy (lazy (expr ())) in
-  natural
-  <~> opt (char_in_string "+-" <~> expr)
-  <~|~> (char '(' >~> expr <~< char ')')
-  <&> fun _ -> ()
-
 let cases =
   let open Alcotest in
   ( "Basic Parser"

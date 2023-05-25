@@ -128,9 +128,9 @@ module Operator (P : Specs.PARSEC) = struct
   module Eval = Eval (P)
   module Flow = Flow (P)
 
-  let ( <~> ) p1 p2 = Flow.sequence p1 p2
-  let ( <~< ) p1 p2 = Functor.(p1 <~> p2 <&> fst)
-  let ( >~> ) p1 p2 = Functor.(p1 <~> p2 <&> snd)
+  let ( <+> ) p1 p2 = Flow.sequence p1 p2
+  let ( <+< ) p1 p2 = Functor.(p1 <+> p2 <&> fst)
+  let ( >+> ) p1 p2 = Functor.(p1 <+> p2 <&> snd)
   let ( <~|~> ) p1 p2 = Flow.choice p1 p2
 
   let ( <|> ) p1 p2 =
@@ -144,7 +144,7 @@ end
 module Syntax (P : Specs.PARSEC) = struct
   module Operator = Operator (P)
 
-  let ( and<+> ) a b = Operator.(a <~> b)
+  let ( and<+> ) a b = Operator.(a <+> b)
 end
 
 module Atomic (P : Specs.PARSEC) = struct
@@ -181,7 +181,7 @@ module Atomic (P : Specs.PARSEC) = struct
     let open Eval in
     let open Operator in
     do_try
-      (fold_left (fun p e -> p <~< atom e) (return ()) l <&> Stdlib.Fun.const l)
+      (fold_left (fun p e -> p <+< atom e) (return ()) l <&> Stdlib.Fun.const l)
 end
 
 module Occurrence (P : Specs.PARSEC) = struct
@@ -260,9 +260,9 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
     let open Operator in
     let open Occurrence in
     atom '-'
-    >~> return (( * ) (-1))
-    <|> (opt (atom '+') >~> return Stdlib.Fun.id)
-    <~> natural
+    >+> return (( * ) (-1))
+    <|> (opt (atom '+') >+> return Stdlib.Fun.id)
+    <+> natural
     <&> fun (f, i) -> f i
 
   let string s =
@@ -291,9 +291,9 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
       let open Occurrence in
       let open Alda_source.Utils in
       char '"'
-      >~> opt_rep
-            (char '\\' >~> char '"' <&> Stdlib.Fun.const '"' <|> not (char '"'))
-      <~< char '"'
+      >+> opt_rep
+            (char '\\' >+> char '"' <&> Stdlib.Fun.const '"' <|> not (char '"'))
+      <+< char '"'
       <&> string_of_chars
 
     let char_delimited =
@@ -301,8 +301,8 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
       let open Atomic in
       let open Operator in
       char '\''
-      >~> (string "\\\'" <&> Stdlib.Fun.const '\'' <|> not (char '\''))
-      <~< char '\''
+      >+> (string "\\\'" <&> Stdlib.Fun.const '\'' <|> not (char '\''))
+      <+< char '\''
 
     let string = string_delimited
     let char = char_delimited

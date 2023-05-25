@@ -9,7 +9,7 @@ let to_result = function
 let parser_seq () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result = response @@ (return 'a' <~> return 1) @@ Parsec.source []
+  let result = response @@ (return 'a' <+> return 1) @@ Parsec.source []
   and expected = (Some ('a', 1), false) in
   Alcotest.(check (pair (option (pair char int)) bool))
     "sequence" expected result
@@ -17,14 +17,14 @@ let parser_seq () =
 let parser_seq_left () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result = response @@ (return 'a' <~< return 1) @@ Parsec.source []
+  let result = response @@ (return 'a' <+< return 1) @@ Parsec.source []
   and expected = (Some 'a', false) in
   Alcotest.(check (pair (option char) bool)) "sequence left" expected result
 
 let parser_seq_right () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result = response @@ (return 'a' >~> return 1) @@ Parsec.source []
+  let result = response @@ (return 'a' >+> return 1) @@ Parsec.source []
   and expected = (Some 1, false) in
   Alcotest.(check (pair (option int) bool)) "sequence right" expected result
 

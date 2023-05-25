@@ -185,7 +185,7 @@ let parser_lookahead_char_then_char () =
   let open Parsers.Operator (Parsec) in
   let open Parsers.Literal (Parsec) in
   let result =
-    response @@ (lookahead (char 'a') <~> char 'a') @@ Parsec.source [ 'a' ]
+    response @@ (lookahead (char 'a') <+> char 'a') @@ Parsec.source [ 'a' ]
   and expected = (Some ('a', 'a'), true) in
   Alcotest.(check (pair (option (pair char char)) bool))
     "lookahead char then char" expected result

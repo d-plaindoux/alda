@@ -13,9 +13,9 @@ let rec expr () =
   (* 
     expr ::= natural ((+|-) expr)? | "(" expr ")" 
   *)
-  (natural <~> opt (char_in_string "+-" <~> expr))
-  <~|~> 
-  (char '(' >~> expr <~< char ')')
+  (natural <+> opt (char_in_string "+-" <+> expr))
+  <|> 
+  (char '(' >+> expr <+< char ')')
   <&> fun _ -> ()
 ```
 

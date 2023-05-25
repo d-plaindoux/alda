@@ -92,11 +92,11 @@ module Eval (P : Specs.PARSEC) = struct
       )
 end
 
-module Operator (P : Specs.PARSEC) = struct
+module Flow (P : Specs.PARSEC) = struct
   module Functor = Functor (P)
   module Eval = Eval (P)
 
-  let ( <~> ) p1 p2 s =
+  let sequence p1 p2 s =
     let open Response.Destruct in
     let open Response.Construct in
     fold
@@ -108,10 +108,7 @@ module Operator (P : Specs.PARSEC) = struct
       ~failure:(fun (m, b1, s1) -> failure (m, b1, s1))
       (p1 s)
 
-  let ( <~< ) p1 p2 = Functor.(p1 <~> p2 <&> fst)
-  let ( >~> ) p1 p2 = Functor.(p1 <~> p2 <&> snd)
-
-  let ( <~|~> ) p1 p2 s =
+  let choice p1 p2 s =
     let open Response.Destruct in
     let open Response.Construct in
     let open Functor in
@@ -121,14 +118,33 @@ module Operator (P : Specs.PARSEC) = struct
         if b then failure (m, b, s) else (p2 <&> fun e -> Either.Right e) s )
       ((p1 <&> fun e -> Either.Left e) s)
 
-  let ( <|> ) p1 p2 =
-    Functor.(p1 <~|~> p2 <&> function Either.Left a | Either.Right a -> a)
-
-  let ( <||> ) p1 p2 = Eval.do_try p1 <|> p2
-
-  let ( <?> ) p f =
+  let filter p f =
     let open Eval in
     satisfy p f
+end
+
+module Operator (P : Specs.PARSEC) = struct
+  module Functor = Functor (P)
+  module Eval = Eval (P)
+  module Flow = Flow (P)
+
+  let ( <~> ) p1 p2 = Flow.sequence p1 p2
+  let ( <~< ) p1 p2 = Functor.(p1 <~> p2 <&> fst)
+  let ( >~> ) p1 p2 = Functor.(p1 <~> p2 <&> snd)
+  let ( <~|~> ) p1 p2 = Flow.choice p1 p2
+
+  let ( <|> ) p1 p2 =
+    Functor.(
+      Flow.choice p1 p2 <&> function Either.Left a | Either.Right a -> a )
+
+  let ( <||> ) p1 p2 = Eval.do_try p1 <|> p2
+  let ( <?> ) p f = Flow.filter p f
+end
+
+module Syntax (P : Specs.PARSEC) = struct
+  module Operator = Operator (P)
+
+  let ( and<+> ) a b = Operator.(a <~> b)
 end
 
 module Atomic (P : Specs.PARSEC) = struct

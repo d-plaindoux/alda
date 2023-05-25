@@ -7,4 +7,5 @@ let () =
       ; T03_atomic.cases
       ; T04_occurrence.cases
       ; T05_literal.cases
+      ; T06_syntax.cases
       ] )

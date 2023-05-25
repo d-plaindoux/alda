@@ -31,7 +31,7 @@ let parser_seq_right () =
 let parser_choice_left () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result = response @@ (return 'a' <|> return 'b') @@ Parsec.source []
+  let result = response @@ ?=(return 'a' <|> return 'b') @@ Parsec.source []
   and expected = (Some 'a', false) in
   Alcotest.(check (pair (option char) bool)) "choice left" expected result
 
@@ -39,7 +39,7 @@ let parser_choice_right () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Eval (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result = response @@ (fail <|> return 'b') @@ Parsec.source []
+  let result = response @@ ?=(fail <|> return 'b') @@ Parsec.source []
   and expected = (Some 'b', false) in
   Alcotest.(check (pair (option char) bool)) "choice right" expected result
 
@@ -48,14 +48,14 @@ let parser_choice_fail () =
   let open Parsers.Eval (Parsec) in
   let open Parsers.Operator (Parsec) in
   let result =
-    response @@ (fail ~consumed:true <|> return 'b') @@ Parsec.source []
+    response @@ ?=(fail ~consumed:true <|> return 'b') @@ Parsec.source []
   and expected = (None, true) in
   Alcotest.(check (pair (option char) bool)) "choice fail" expected result
 
 let parser_backtrack_choice_left () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result = response @@ (return 'a' <||> return 'b') @@ Parsec.source []
+  let result = response @@ ?=(return 'a' <||> return 'b') @@ Parsec.source []
   and expected = (Some 'a', false) in
   Alcotest.(check (pair (option char) bool))
     "backtrack choice left" expected result
@@ -64,7 +64,7 @@ let parser_backtrack_choice_right () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Eval (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result = response @@ (fail <||> return 'b') @@ Parsec.source []
+  let result = response @@ ?=(fail <||> return 'b') @@ Parsec.source []
   and expected = (Some 'b', false) in
   Alcotest.(check (pair (option char) bool))
     "backtrack choice right" expected result
@@ -74,7 +74,7 @@ let parser_backtrack_choice_do_not_fail () =
   let open Parsers.Eval (Parsec) in
   let open Parsers.Operator (Parsec) in
   let result =
-    response @@ (fail ~consumed:true <||> return 'b') @@ Parsec.source []
+    response @@ ?=(fail ~consumed:true <||> return 'b') @@ Parsec.source []
   and expected = (Some 'b', false) in
   Alcotest.(check (pair (option char) bool))
     "backtrack choice do not fail" expected result
@@ -84,7 +84,7 @@ let parser_either_choice_left () =
   let open Parsers.Eval (Parsec) in
   let open Parsers.Operator (Parsec) in
   let result, consume =
-    response @@ (return 'b' <~|~> return 1) @@ Parsec.source []
+    response @@ (return 'b' <|> return 1) @@ Parsec.source []
   and expected = (Some (Result.Ok 'b'), false) in
   Alcotest.(check (pair (option (result char int)) bool))
     "either choice left" expected
@@ -94,7 +94,7 @@ let parser_either_choice_right () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Eval (Parsec) in
   let open Parsers.Operator (Parsec) in
-  let result, consume = response @@ (fail <~|~> return 1) @@ Parsec.source []
+  let result, consume = response @@ (fail <|> return 1) @@ Parsec.source []
   and expected = (Some (Result.Error 1), false) in
   Alcotest.(check (pair (option (result char int)) bool))
     "either choice left" expected

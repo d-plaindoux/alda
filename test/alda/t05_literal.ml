@@ -114,7 +114,7 @@ let parser_sequence () =
   let open Parsers.Literal (Parsec) in
   let result =
     response
-    @@ sequence (alpha <|> digit)
+    @@ sequence ?=(alpha <|> digit)
     @@ Parsec.source (Utils.chars_of_string "Hello123")
   and expected = (Some "Hello123", true) in
   Alcotest.(check (pair (option string) bool)) "sequence" expected result

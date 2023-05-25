@@ -118,9 +118,8 @@ module Flow (P : Specs.PARSEC) = struct
         if b then failure (m, b, s) else (p2 <&> fun e -> Either.Right e) s )
       ((p1 <&> fun e -> Either.Left e) s)
 
-  let filter p f =
-    let open Eval in
-    satisfy p f
+  let filter p f = Eval.(satisfy p f)
+  let unify p = Functor.(p <&> function Either.Left a | Either.Right a -> a)
 end
 
 module Operator (P : Specs.PARSEC) = struct
@@ -131,14 +130,10 @@ module Operator (P : Specs.PARSEC) = struct
   let ( <+> ) p1 p2 = Flow.sequence p1 p2
   let ( <+< ) p1 p2 = Functor.(p1 <+> p2 <&> fst)
   let ( >+> ) p1 p2 = Functor.(p1 <+> p2 <&> snd)
-  let ( <~|~> ) p1 p2 = Flow.choice p1 p2
-
-  let ( <|> ) p1 p2 =
-    Functor.(
-      Flow.choice p1 p2 <&> function Either.Left a | Either.Right a -> a )
-
-  let ( <||> ) p1 p2 = Eval.do_try p1 <|> p2
+  let ( <|> ) p1 p2 = Flow.choice p1 p2
+  let ( <||> ) p1 p2 = Flow.choice (Eval.do_try p1) p2
   let ( <?> ) p f = Flow.filter p f
+  let ( ?= ) p = Flow.unify p
 end
 
 module Syntax (P : Specs.PARSEC) = struct
@@ -259,9 +254,9 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
     let open Atomic in
     let open Operator in
     let open Occurrence in
-    atom '-'
-    >+> return (( * ) (-1))
-    <|> (opt (atom '+') >+> return Stdlib.Fun.id)
+    ?=( atom '-'
+      >+> return (( * ) (-1))
+      <|> (opt (atom '+') >+> return Stdlib.Fun.id) )
     <+> natural
     <&> fun (f, i) -> f i
 
@@ -275,7 +270,7 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
     let open List in
     let open Eval in
     let open Operator in
-    fold_left (fun p e -> p <|> string e) fail l
+    fold_left (fun p e -> ?=(p <|> string e)) fail l
 
   let sequence p =
     let open Monad in
@@ -292,7 +287,10 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
       let open Alda_source.Utils in
       char '"'
       >+> opt_rep
-            (char '\\' >+> char '"' <&> Stdlib.Fun.const '"' <|> not (char '"'))
+            ?=( char '\\'
+              >+> char '"'
+              <&> Stdlib.Fun.const '"'
+              <|> not (char '"') )
       <+< char '"'
       <&> string_of_chars
 
@@ -301,7 +299,7 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
       let open Atomic in
       let open Operator in
       char '\''
-      >+> (string "\\\'" <&> Stdlib.Fun.const '\'' <|> not (char '\''))
+      >+> ?=(string "\\\'" <&> Stdlib.Fun.const '\'' <|> not (char '\''))
       <+< char '\''
 
     let string = string_delimited
@@ -316,7 +314,7 @@ module Expr (P : Specs.PARSEC) = struct
   let option x p =
     let open Monad in
     let open Operator in
-    p <|> return x
+    ?=(p <|> return x)
 
   let term prefix t postfix =
     let open Stdlib.Fun in
@@ -341,7 +339,7 @@ module Expr (P : Specs.PARSEC) = struct
     let* f = op in
     let* y = p in
     let r = f x y in
-    infixL op p r <|> return r
+    ?=(infixL op p r <|> return r)
 
   let rec infixR op p x =
     let open Monad in
@@ -349,7 +347,7 @@ module Expr (P : Specs.PARSEC) = struct
     let open Monad.Infix in
     let open Operator in
     let* f = op in
-    let* y = p >>= fun r -> infixR op p r <|> return r in
+    let* y = p >>= fun r -> ?=(infixR op p r <|> return r) in
     return @@ f x y
 end
 

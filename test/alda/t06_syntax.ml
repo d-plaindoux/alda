@@ -1,11 +1,6 @@
 open Common
 open Alda.Parser
 
-let to_result = function
-  | Some (Either.Left a) -> Some (Result.Ok a)
-  | Some (Either.Right a) -> Some (Result.Error a)
-  | None -> None
-
 let parser_seq () =
   let open Parsers.Monad (Parsec) in
   let open Parsers.Syntax (Parsec) in

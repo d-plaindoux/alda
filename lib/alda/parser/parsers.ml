@@ -118,6 +118,26 @@ module Flow (P : Specs.PARSEC) = struct
         if b then failure (m, b, s) else (p2 <&> fun e -> Either.Right e) s )
       ((p1 <&> fun e -> Either.Left e) s)
 
+  let eager_choice p1 p2 s =
+    let open Alda_source.Location.Access in
+    let open P.Source.Access in
+    let open Response.Destruct in
+    let open Response.Construct in
+    let open Functor in
+    let r1 = (p1 <&> fun e -> Either.Left e) s in
+    let r2 = (p2 <&> fun e -> Either.Right e) s in
+    fold
+      ~success:(fun (a, b, s) ->
+        fold
+          ~success:(fun (a', b', s') ->
+            if position (location s) < position (location s')
+            then success (a', b', s')
+            else success (a, b, s) )
+          ~failure:(fun _ -> success (a, b, s))
+          r2 )
+      ~failure:(fun _ -> r2)
+      r1
+
   let filter p f = Eval.(satisfy p f)
   let unify p = Functor.(p <&> function Either.Left a | Either.Right a -> a)
 end
@@ -128,12 +148,13 @@ module Operator (P : Specs.PARSEC) = struct
   module Flow = Flow (P)
 
   let ( <+> ) p1 p2 = Flow.sequence p1 p2
-  let ( <+< ) p1 p2 = Functor.(p1 <+> p2 <&> fst)
-  let ( >+> ) p1 p2 = Functor.(p1 <+> p2 <&> snd)
   let ( <|> ) p1 p2 = Flow.choice p1 p2
-  let ( <||> ) p1 p2 = Flow.choice (Eval.do_try p1) p2
   let ( <?> ) p f = Flow.filter p f
   let ( ?= ) p = Flow.unify p
+  let ( <+< ) p1 p2 = Functor.(p1 <+> p2 <&> fst)
+  let ( >+> ) p1 p2 = Functor.(p1 <+> p2 <&> snd)
+  let ( <||> ) p1 p2 = Flow.choice (Eval.do_try p1) p2
+  let ( <|||> ) p1 p2 = Flow.eager_choice p1 p2
 end
 
 module Syntax (P : Specs.PARSEC) = struct

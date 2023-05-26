@@ -8,4 +8,5 @@ let () =
       ; T04_occurrence.cases
       ; T05_literal.cases
       ; T06_syntax.cases
+      ; T07_extra.cases
       ] )

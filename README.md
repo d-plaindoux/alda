@@ -9,14 +9,13 @@ module Parsec = Parsers.Parsec (Sources.FromChars)
 
 let rec expr () =
   let open Parsers.All_for_chars (Parsec) in
-  let expr = do_lazy (lazy (expr ())) in
-  (* 
+  (*  
     expr ::= natural ((+|-) expr)? | "(" expr ")" 
   *)
-  (natural <+> opt (char_in_string "+-" <+> expr))
-  <|> 
-  (char '(' >+> expr <+< char ')')
-  <&> fun _ -> ()
+  let expr = do_lazy (lazy (expr ())) in
+  let operation = natural <+> opt (char_in_string "+-" <+> expr)
+  and parenthesis = char '(' >+> expr <+< char ')' in  
+  operation <|> parenthesis <&> fun _ -> ()
 ```
 
 # License 

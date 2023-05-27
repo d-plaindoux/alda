@@ -1,10 +1,10 @@
-open Common
 open Alda.Parser
+open Common
 
 let parser_eager_choice_left () =
-  let open Parsers.Monad (Parsec) in
-  let open Parsers.Operator (Parsec) in
-  let open Parsers.Literal (Parsec) in
+  let open Control.Monad (Parsec) in
+  let open Operator (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response
     @@ ?=( char 'a'
@@ -16,9 +16,9 @@ let parser_eager_choice_left () =
   Alcotest.(check (pair (option int) bool)) "eager choice left" expected result
 
 let parser_eager_choice_right () =
-  let open Parsers.Monad (Parsec) in
-  let open Parsers.Operator (Parsec) in
-  let open Parsers.Literal (Parsec) in
+  let open Control.Monad (Parsec) in
+  let open Operator (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response
     @@ ?=(char 'a' <&> (fun _ -> 1) <|||> (char 'a' <+> char 'b' <&> fun _ -> 2))

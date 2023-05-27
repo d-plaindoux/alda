@@ -8,4 +8,4 @@ let response r =
     ~failure:(fun (_, b, _) -> (None, b))
     r
 
-module Parsec = Parsers.Parsec (Sources.FromChars)
+module Parsec = Parsec (FromChars)

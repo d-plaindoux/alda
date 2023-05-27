@@ -5,10 +5,11 @@ Intuitive and simple to use OCaml parsec
 # Examples
 
 ```ocaml
-module Parsec = Parsers.Parsec (Sources.FromChars)
+module Parsec = Alda.Parser.Parsec (Alda.Source.FromChars)
 
 let rec expr () =
-  let open Parsers.All_for_chars (Parsec) in
+  let open Alda.Parser.Core (Parsec) in
+  let open Alda.Parser.Literal (Parsec)
   (*  
     expr ::= natural ((+|-) expr)? | "(" expr ")" 
   *)

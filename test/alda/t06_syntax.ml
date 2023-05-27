@@ -1,9 +1,9 @@
-open Common
 open Alda.Parser
+open Common
 
 let parser_seq () =
-  let open Parsers.Monad (Parsec) in
-  let open Parsers.Syntax (Parsec) in
+  let open Syntax (Parsec) in
+  let open Control.Monad (Parsec) in
   let p =
     let+ a = return 'a'
     and<+> b = return 1 in
@@ -15,8 +15,8 @@ let parser_seq () =
     "sequence" expected result
 
 let parser_seq_left () =
-  let open Parsers.Monad (Parsec) in
-  let open Parsers.Syntax (Parsec) in
+  let open Syntax (Parsec) in
+  let open Control.Monad (Parsec) in
   let p =
     let+ a = return 'a'
     and<+> _ = return 1 in
@@ -27,8 +27,8 @@ let parser_seq_left () =
   Alcotest.(check (pair (option char) bool)) "sequence left" expected result
 
 let parser_seq_right () =
-  let open Parsers.Monad (Parsec) in
-  let open Parsers.Syntax (Parsec) in
+  let open Syntax (Parsec) in
+  let open Control.Monad (Parsec) in
   let p =
     let+ _ = return 'a'
     and<+> b = return 1 in

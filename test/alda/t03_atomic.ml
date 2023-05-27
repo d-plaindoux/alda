@@ -1,56 +1,56 @@
-open Common
 open Alda.Parser
+open Common
 
 let parser_any () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ any @@ Parsec.source [ 'a' ]
   and expected = (Some 'a', true) in
   Alcotest.(check (pair (option char) bool)) "any" expected result
 
 let parser_atom () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ atom 'a' @@ Parsec.source [ 'a' ]
   and expected = (Some 'a', true) in
   Alcotest.(check (pair (option char) bool)) "atom" expected result
 
 let parser_atom_fail () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ atom 'a' @@ Parsec.source [ 'b' ]
   and expected = (None, false) in
   Alcotest.(check (pair (option char) bool)) "atom fail" expected result
 
 let parser_atom_in () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ atom_in [ 'a'; 'b' ] @@ Parsec.source [ 'b' ]
   and expected = (Some 'b', true) in
   Alcotest.(check (pair (option char) bool)) "atom in" expected result
 
 let parser_atom_in_fail () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ atom_in [ 'a'; 'b' ] @@ Parsec.source [ 'c' ]
   and expected = (None, false) in
   Alcotest.(check (pair (option char) bool)) "atom in fail" expected result
 
 let parser_atoms () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ atoms [ 'a'; 'b' ] @@ Parsec.source [ 'a'; 'b' ]
   and expected = (Some [ 'a'; 'b' ], true) in
   Alcotest.(check (pair (option (list char)) bool)) "atoms" expected result
 
 let parser_atoms_fail () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ atoms [ 'a'; 'b' ] @@ Parsec.source [ 'a'; 'c' ]
   and expected = (None, false) in
   Alcotest.(check (pair (option (list char)) bool)) "atoms fail" expected result
 
 let parser_not_atom () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ (not (atom 'a')) @@ Parsec.source [ 'b' ]
   and expected = (Some 'b', true) in
   Alcotest.(check (pair (option char) bool)) "not atom" expected result
 
 let parser_not_atom_fail () =
-  let open Parsers.Atomic (Parsec) in
+  let open Atomic (Parsec) in
   let result = response @@ (not (atom 'a')) @@ Parsec.source [ 'a' ]
   and expected = (None, false) in
   Alcotest.(check (pair (option char) bool)) "not atom fail" expected result

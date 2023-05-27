@@ -1,107 +1,107 @@
-open Common
 open Alda.Source
 open Alda.Parser
+open Common
 
 let parser_char () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char 'a' @@ Parsec.source [ 'a' ]
   and expected = (Some 'a', true) in
   Alcotest.(check (pair (option char) bool)) "char" expected result
 
 let parser_char_fail () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char 'a' @@ Parsec.source [ 'b' ]
   and expected = (None, false) in
   Alcotest.(check (pair (option char) bool)) "char fail" expected result
 
 let parser_char_in_range () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char_in_range ('a', 'c') @@ Parsec.source [ 'b' ]
   and expected = (Some 'b', true) in
   Alcotest.(check (pair (option char) bool)) "char in range" expected result
 
 let parser_char_in_range_lower () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char_in_range ('a', 'c') @@ Parsec.source [ 'a' ]
   and expected = (Some 'a', true) in
   Alcotest.(check (pair (option char) bool))
     "char in range lower" expected result
 
 let parser_char_in_range_upper () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char_in_range ('a', 'c') @@ Parsec.source [ 'c' ]
   and expected = (Some 'c', true) in
   Alcotest.(check (pair (option char) bool))
     "char in range upper" expected result
 
 let parser_char_in_range_fail () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char_in_range ('a', 'c') @@ Parsec.source [ 'd' ]
   and expected = (None, false) in
   Alcotest.(check (pair (option char) bool))
     "char in range fail" expected result
 
 let parser_char_in_list () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char_in_list [ 'a'; 'b' ] @@ Parsec.source [ 'b' ]
   and expected = (Some 'b', true) in
   Alcotest.(check (pair (option char) bool)) "char in list" expected result
 
 let parser_char_in_string () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ char_in_string "ab" @@ Parsec.source [ 'b' ]
   and expected = (Some 'b', true) in
   Alcotest.(check (pair (option char) bool)) "char in string" expected result
 
 let parser_digit () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ digit @@ Parsec.source [ '0' ]
   and expected = (Some '0', true) in
   Alcotest.(check (pair (option char) bool)) "digit" expected result
 
 let parser_alpha () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ alpha @@ Parsec.source [ 'g' ]
   and expected = (Some 'g', true) in
   Alcotest.(check (pair (option char) bool)) "alpha" expected result
 
 let parser_natural () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ natural @@ Parsec.source (Utils.chars_of_string "1234g")
   and expected = (Some 1234, true) in
   Alcotest.(check (pair (option int) bool)) "natural" expected result
 
 let parser_integer () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ integer @@ Parsec.source (Utils.chars_of_string "1234g")
   and expected = (Some 1234, true) in
   Alcotest.(check (pair (option int) bool)) "integer" expected result
 
 let parser_negative_integer () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ integer @@ Parsec.source (Utils.chars_of_string "-1234g")
   and expected = (Some (-1234), true) in
   Alcotest.(check (pair (option int) bool)) "negative integer" expected result
 
 let parser_positive_integer () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ integer @@ Parsec.source (Utils.chars_of_string "+1234g")
   and expected = (Some 1234, true) in
   Alcotest.(check (pair (option int) bool)) "positive integer" expected result
 
 let parser_string () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ string "Hello" @@ Parsec.source (Utils.chars_of_string "Hello")
   and expected = (Some "Hello", true) in
   Alcotest.(check (pair (option string) bool)) "string" expected result
 
 let parser_string_in_list () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response
     @@ string_in_list [ "World"; "Hello" ]
@@ -110,8 +110,8 @@ let parser_string_in_list () =
   Alcotest.(check (pair (option string) bool)) "string list" expected result
 
 let parser_sequence () =
-  let open Parsers.Operator (Parsec) in
-  let open Parsers.Literal (Parsec) in
+  let open Operator (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response
     @@ sequence ?=(alpha <|> digit)
@@ -120,7 +120,7 @@ let parser_sequence () =
   Alcotest.(check (pair (option string) bool)) "sequence" expected result
 
 let parser_delimited_string () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response
     @@ Delimited.string
@@ -130,7 +130,7 @@ let parser_delimited_string () =
     "delimited string" expected result
 
 let parser_delimited_string_escaped () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response
     @@ Delimited.string
@@ -140,7 +140,7 @@ let parser_delimited_string_escaped () =
     "delimited string escaped" expected result
 
 let parser_delimited_string_meta () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response
     @@ Delimited.string
@@ -150,14 +150,14 @@ let parser_delimited_string_meta () =
     "delimited string meta" expected result
 
 let parser_delimited_char () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ Delimited.char @@ Parsec.source (Utils.chars_of_string "'H'")
   and expected = (Some 'H', true) in
   Alcotest.(check (pair (option char) bool)) "delimited char" expected result
 
 let parser_delimited_char_escaped () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ Delimited.char @@ Parsec.source (Utils.chars_of_string "'\\''")
   and expected = (Some '\'', true) in
@@ -165,7 +165,7 @@ let parser_delimited_char_escaped () =
     "delimited char escaped" expected result
 
 let parser_delimited_char_meta () =
-  let open Parsers.Literal (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ Delimited.char @@ Parsec.source (Utils.chars_of_string "'\n'")
   and expected = (Some '\n', true) in
@@ -173,17 +173,17 @@ let parser_delimited_char_meta () =
     "delimited char meta" expected result
 
 let parser_lookahead_char () =
-  let open Parsers.Eval (Parsec) in
-  let open Parsers.Operator (Parsec) in
-  let open Parsers.Literal (Parsec) in
+  let open Eval (Parsec) in
+  let open Operator (Parsec) in
+  let open Literal (Parsec) in
   let result = response @@ lookahead (char 'a') @@ Parsec.source [ 'a' ]
   and expected = (Some 'a', false) in
   Alcotest.(check (pair (option char) bool)) "lookahead char" expected result
 
 let parser_lookahead_char_then_char () =
-  let open Parsers.Eval (Parsec) in
-  let open Parsers.Operator (Parsec) in
-  let open Parsers.Literal (Parsec) in
+  let open Eval (Parsec) in
+  let open Operator (Parsec) in
+  let open Literal (Parsec) in
   let result =
     response @@ (lookahead (char 'a') <+> char 'a') @@ Parsec.source [ 'a' ]
   and expected = (Some ('a', 'a'), true) in

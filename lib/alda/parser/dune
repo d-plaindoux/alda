@@ -2,4 +2,4 @@
  (name alda_parser)
  (public_name alda.parser)
  (libraries preface alda.source)
- (modules_without_implementation specs))
+ (modules_without_implementation specs alda_parser))

@@ -17,7 +17,7 @@ let expr =
   and _RPAR_ = char ')' in
   let operations expr = integer <+> opt (_OPERATOR_ <+> expr) >+> return ()
   and parenthesis expr = _LPAR_ <+> expr <+> _RPAR_ >+> return () in
-  fix (fun expr -> ?=(operations expr <|> parenthesis expr))
+  fix (fun expr -> operations expr <|> parenthesis expr)
 ```
 
 # License 

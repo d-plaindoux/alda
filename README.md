@@ -7,16 +7,17 @@ Intuitive and simple to use OCaml parsec
 ```ocaml
 module Parsec = Alda.Parser.Parsec (Alda.Source.FromChars)
 
-let rec expr () =
+(* expr ::= natural (('+'|'-') expr)? | '(' expr ')' *)
+let expr =
   let open Alda.Parser.Core (Parsec) in
-  let open Alda.Parser.Literal (Parsec)
-  (*  
-    expr ::= natural ((+|-) expr)? | "(" expr ")" 
-  *)
-  let expr = do_lazy (lazy (expr ())) in
-  let operation = natural <+> opt (char_in_string "+-" <+> expr)
-  and parenthesis = char '(' >+> expr <+< char ')' in  
-  operation <|> parenthesis <&> fun _ -> ()
+  let open Alda.Parser.Literal (Parsec) in
+  let open Alda.Source.Utils in
+  let _OPERATOR_ = char_in_string "+-"
+  and _LPAR_ = char '('
+  and _RPAR_ = char ')' in
+  let operations expr = integer <+> opt (_OPERATOR_ <+> expr) >+> return ()
+  and parenthesis expr = _LPAR_ <+> expr <+> _RPAR_ >+> return () in
+  fix (fun expr -> ?=(operations expr <|> parenthesis expr))
 ```
 
 # License 

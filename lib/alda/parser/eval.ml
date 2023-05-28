@@ -50,4 +50,6 @@ module Eval (P : Specs.PARSEC) = struct
       ( p
       >>= fun a -> if f a then return a else fail ~consumed:false ~message:None
       )
+
+  let rec fix f s = f (fix f) s
 end

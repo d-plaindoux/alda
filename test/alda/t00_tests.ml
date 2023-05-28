@@ -9,4 +9,5 @@ let () =
       ; T05_literal.cases
       ; T06_syntax.cases
       ; T07_extra.cases
+      ; T08_examples.cases
       ] )

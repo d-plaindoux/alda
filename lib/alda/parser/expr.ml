@@ -5,7 +5,7 @@ module Expr (P : Specs.PARSEC) = struct
   let option x p =
     let open Monad in
     let open Operator in
-    ?=(p <|> return x)
+    p <|> return x
 
   let term prefix t postfix =
     let open Stdlib.Fun in
@@ -30,7 +30,7 @@ module Expr (P : Specs.PARSEC) = struct
     let* f = op in
     let* y = p in
     let r = f x y in
-    ?=(infixL op p r <|> return r)
+    infixL op p r <|> return r
 
   let rec infixR op p x =
     let open Monad in
@@ -38,6 +38,6 @@ module Expr (P : Specs.PARSEC) = struct
     let open Monad.Infix in
     let open Operator in
     let* f = op in
-    let* y = p >>= fun r -> ?=(infixR op p r <|> return r) in
+    let* y = p >>= fun r -> infixR op p r <|> return r in
     return @@ f x y
 end

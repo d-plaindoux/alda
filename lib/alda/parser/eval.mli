@@ -7,4 +7,5 @@ module Eval : functor (P : Specs.PARSEC) -> sig
   val do_try : 'a P.t -> 'a P.t
   val lookahead : 'a P.t -> 'a P.t
   val satisfy : 'a P.t -> ('a -> bool) -> 'a P.t
+  val fix : ('a P.t -> 'a P.t) -> 'a P.t
 end

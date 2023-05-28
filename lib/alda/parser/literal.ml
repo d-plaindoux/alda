@@ -40,11 +40,9 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
     let open Atomic in
     let open Operator in
     let open Occurrence in
-    ?=( atom '-'
-      >+> return (( * ) (-1))
-      <|> (opt (atom '+') >+> return Stdlib.Fun.id) )
-    <+> natural
-    <&> fun (f, i) -> f i
+    let negative = atom '-' >+> return (( * ) (-1))
+    and positive = opt (atom '+') >+> return Stdlib.Fun.id in
+    negative <|> positive <+> natural <&> fun (f, i) -> f i
 
   let string s =
     let open Monad in
@@ -56,7 +54,7 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
     let open List in
     let open Eval in
     let open Operator in
-    fold_left (fun p e -> ?=(p <|> string e)) fail l
+    fold_left (fun p e -> p <|> string e) fail l
 
   let sequence p =
     let open Monad in
@@ -73,10 +71,7 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
       let open Alda_source.Utils in
       char '"'
       >+> opt_rep
-            ?=( char '\\'
-              >+> char '"'
-              <&> Stdlib.Fun.const '"'
-              <|> not (char '"') )
+            (char '\\' >+> char '"' <&> Stdlib.Fun.const '"' <|> not (char '"'))
       <+< char '"'
       <&> string_of_chars
 
@@ -85,7 +80,7 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
       let open Atomic in
       let open Operator in
       char '\''
-      >+> ?=(string "\\\'" <&> Stdlib.Fun.const '\'' <|> not (char '\''))
+      >+> (string "\\\'" <&> Stdlib.Fun.const '\'' <|> not (char '\''))
       <+< char '\''
 
     let string = string_delimited

@@ -1,12 +1,12 @@
 type t
 
 module Construct : sig
-  val initial : t
-  val combine : t -> t -> t
-  val create : position:int -> line:int -> column:int -> t
+  val initial : string option -> t
+  val create : file:string option -> position:int -> line:int -> column:int -> t
 end
 
 module Access : sig
+  val file : t -> string option
   val position : t -> int
   val line : t -> int
   val column : t -> int

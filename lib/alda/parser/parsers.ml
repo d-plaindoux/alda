@@ -3,5 +3,5 @@ module Parsec (Source : Alda_source.Specs.SOURCE) = struct
 
   type 'b t = Source.t -> ('b, Source.t) Response.t
 
-  let source c = Source.Construct.create c
+  let source ?(file = None) c = Source.Construct.create ~file c
 end

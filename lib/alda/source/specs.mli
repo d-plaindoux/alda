@@ -13,7 +13,7 @@ module Source : sig
   module Construct : sig
     type c
 
-    val create : c -> t
+    val create : file:string option -> c -> t
   end
 
   module Access : sig

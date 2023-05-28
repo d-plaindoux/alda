@@ -7,7 +7,7 @@ module FromList (Locator : Specs.LOCATOR) = struct
   module Construct = struct
     type c = e list
 
-    let create s = (s, Location.Construct.initial)
+    let create ~file s = (s, Location.Construct.initial file)
   end
 
   module Access = struct
@@ -27,7 +27,14 @@ module FromChars = FromList (struct
     let open Location.Construct in
     let open Location.Access in
     function
-    | '\n' -> create ~position:(position l + 1) ~line:(line l + 1) ~column:1
+    | '\n' ->
+      create ~file:(file l)
+        ~position:(position l + 1)
+        ~line:(line l + 1)
+        ~column:1
     | _ ->
-      create ~position:(position l + 1) ~line:(line l) ~column:(column l + 1)
+      create ~file:(file l)
+        ~position:(position l + 1)
+        ~line:(line l)
+        ~column:(column l + 1)
 end)

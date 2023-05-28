@@ -1,7 +1,7 @@
 type t
 
 module Construct : sig
-  val create : ?file:string option -> Location.t -> Location.t -> t
+  val create : Location.t -> Location.t -> t
 end
 
 module Access : sig

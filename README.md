@@ -20,6 +20,10 @@ let expr =
   fix (fun expr -> operations expr <|> parenthesis expr)
 ```
 
+# Why Alda?
+
+See [Alda](https://www.elfdict.com/wt/250048) definition for more information.
+
 # License 
 
 MIT License

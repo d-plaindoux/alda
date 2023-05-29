@@ -1,7 +1,7 @@
 module Occurrence (P : Specs.PARSEC) = struct
   module Monad = Control.Monad (P)
   module Eval = Eval.Eval (P)
-  module Operator = Flow.Operator (P)
+  module Operator = Operator.Operator (P)
 
   let opt p s =
     let open Response.Destruct in

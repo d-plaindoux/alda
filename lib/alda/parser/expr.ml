@@ -1,6 +1,6 @@
 module Expr (P : Specs.PARSEC) = struct
   module Monad = Control.Monad (P)
-  module Operator = Flow.Operator (P)
+  module Operator = Operator.Operator (P)
 
   let option x p =
     let open Monad in

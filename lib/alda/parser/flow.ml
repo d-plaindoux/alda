@@ -45,25 +45,3 @@ module Flow (P : Specs.PARSEC) = struct
 
   let unify p = Functor.(p <&> function Either.Left a | Either.Right a -> a)
 end
-
-module Operator (P : Specs.PARSEC) = struct
-  module Functor = Control.Functor (P)
-  module Eval = Eval.Eval (P)
-  module Flow = Flow (P)
-
-  let ( <+> ) p1 p2 = Flow.sequence p1 p2
-  let ( <|> ) p1 p2 = Flow.unify @@ Flow.choice p1 p2
-  let ( <?> ) p f = Eval.satisfy p f
-  let ( ?= ) p = Flow.unify p
-  let ( ?! ) p = Eval.do_try p
-  let ( <+< ) p1 p2 = Functor.(p1 <+> p2 <&> fst)
-  let ( >+> ) p1 p2 = Functor.(p1 <+> p2 <&> snd)
-  let ( <||> ) p1 p2 = Flow.choice p1 p2
-  let ( <|||> ) p1 p2 = Flow.eager_choice p1 p2
-end
-
-module Syntax (P : Specs.PARSEC) = struct
-  module Operator = Operator (P)
-
-  let ( and<+> ) a b = Operator.(a <+> b)
-end

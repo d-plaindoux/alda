@@ -2,7 +2,7 @@ module Literal (P : Specs.PARSEC with type Source.e = char) = struct
   module Monad = Control.Monad (P)
   module Atomic = Atomic.Atomic (P)
   module Eval = Eval.Eval (P)
-  module Operator = Flow.Operator (P)
+  module Operator = Operator.Operator (P)
   module Occurrence = Occurrence.Occurrence (P)
 
   let char c =

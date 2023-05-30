@@ -19,4 +19,4 @@ let parse_expr () =
 
 let cases =
   let open Alcotest in
-  ("Examples Parser", [ test_case "expr" `Quick parse_expr ])
+  ("Examples Parser", [ test_case "expression parser" `Quick parse_expr ])

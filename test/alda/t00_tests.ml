@@ -10,4 +10,5 @@ let () =
       ; T06_syntax.cases
       ; T07_extra.cases
       ; T08_examples.cases
+      ; T99_laws.cases
       ] )

@@ -61,6 +61,13 @@ let parser_satisfy_false () =
   and expected = (None, false) in
   Alcotest.(check (pair (option int) bool)) "satisfy false" expected result
 
+let parser_satisfy_fail () =
+  let open Eval (Parsec) in
+  let result =
+    response @@ satisfy (fail ~consumed:true) (( = ) 2) @@ Parsec.source []
+  and expected = (None, true) in
+  Alcotest.(check (pair (option int) bool)) "satisfy fail" expected result
+
 let cases =
   let open Alcotest in
   ( "Basic Parser"
@@ -75,4 +82,5 @@ let cases =
     ; test_case "lookahead" `Quick parser_lookahead
     ; test_case "satisfy" `Quick parser_satisfy_true
     ; test_case "satisfy false" `Quick parser_satisfy_false
+    ; test_case "satisfy fail" `Quick parser_satisfy_fail
     ] )

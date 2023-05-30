@@ -44,12 +44,14 @@ module Eval (P : Specs.PARSEC) = struct
       ~failure:(fun (m, _, _) -> failure (m, false, s))
       (p s)
 
-  let satisfy p f =
-    let open Monad in
-    do_try
-      ( p
-      >>= fun a -> if f a then return a else fail ~consumed:false ~message:None
-      )
+  let satisfy p f s =
+    let open Response.Destruct in
+    let open Response.Construct in
+    fold
+      ~success:(fun (a, b, s') ->
+        if f a then success (a, b, s') else failure (None, false, s) )
+      ~failure:(fun (m, c, s) -> failure (m, c, s))
+      (p s)
 
   let rec fix f s = f (fix f) s
 end

@@ -1,4 +1,4 @@
-module Functor (P : Specs.PARSEC) = Preface_make.Functor.Via_map (struct
+module Functor (P : Specs.PARSEC) = Preface.Make.Functor.Via_map (struct
   type 'a t = 'a P.t
 
   let map f p s =
@@ -10,7 +10,7 @@ module Functor (P : Specs.PARSEC) = Preface_make.Functor.Via_map (struct
       (p s)
 end)
 
-module Monad (P : Specs.PARSEC) = Preface_make.Monad.Via_return_and_bind (struct
+module Monad (P : Specs.PARSEC) = Preface.Make.Monad.Via_return_and_bind (struct
   type 'a t = 'a P.t
 
   let return v s =

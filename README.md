@@ -4,20 +4,34 @@ Intuitive and simple to use OCaml parsec
 
 # Examples
 
+The following example shows how to design a parser capable of recognizing 
+expressions such as those described here:
+
+```
+expr ::= integer (('+'|'-') expr)? | '(' expr ')'
+```
+
 ```ocaml
 module Parsec = Alda.Parser.Parsec (Alda.Source.FromChars)
 
-(* expr ::= natural (('+'|'-') expr)? | '(' expr ')' *)
 let expr =
   let open Alda.Parser.Core (Parsec) in
   let open Alda.Parser.Literal (Parsec) in
-  let open Alda.Source.Utils in
+
   let _OPERATOR_ = char_in_string "+-"
   and _LPAR_ = char '('
   and _RPAR_ = char ')' in
   let operations expr = integer <+> opt (_OPERATOR_ <+> expr) >+> return ()
   and parenthesis expr = _LPAR_ <+> expr <+> _RPAR_ >+> return () in
   fix (fun expr -> operations expr <|> parenthesis expr)
+```
+
+Calling the analyzer is then very simple and easy, as the following code fragment shows:
+
+```ocaml
+let main = 
+  let open Alda.Source.Utils in
+  expr @@ Parsec.source (chars_of_string "+1+(-2+-3)")  
 ```
 
 # Why Alda?
